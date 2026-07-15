@@ -1,6 +1,13 @@
-# FastAPI Backend
+# Shipment Tracking API
 
-A starter Python backend project structured for building an API with [FastAPI](https://fastapi.tiangolo.com/).
+A small FastAPI application for retrieving shipment information from an in-memory data store.
+
+## Features
+
+- Retrieve a sample shipment.
+- Retrieve the most recently added shipment.
+- Look up a shipment by its numeric ID.
+- Browse the API with FastAPI's Swagger UI, ReDoc, or Scalar.
 
 ## Project structure
 
@@ -8,7 +15,7 @@ A starter Python backend project structured for building an API with [FastAPI](h
 .
 ├── app/
 │   ├── __init__.py
-│   └── main.py       # FastAPI application entry point
+│   └── main.py       # FastAPI application and shipment endpoints
 ├── .gitignore
 └── README.md
 ```
@@ -22,21 +29,42 @@ python -m venv env
 .\env\Scripts\Activate.ps1
 ```
 
-Install the application dependencies:
+Install the dependencies:
 
 ```powershell
-pip install fastapi "uvicorn[standard]"
+pip install fastapi "uvicorn[standard]" scalar-fastapi
 ```
 
 ## Run the API
 
-Once `app/main.py` defines an ASGI application named `app`, start the development server with:
+Start the development server from the project root:
 
 ```powershell
 uvicorn app.main:app --reload
 ```
 
-The API will be available at `http://127.0.0.1:8000`, with interactive documentation at:
+The API will run at `http://127.0.0.1:8000`.
 
-- `http://127.0.0.1:8000/docs`
-- `http://127.0.0.1:8000/redoc`
+## Endpoints
+
+| Method | Path | Description |
+| --- | --- | --- |
+| `GET` | `/shipment` | Returns a sample shipment. |
+| `GET` | `/shipment/latest` | Returns the shipment with the highest ID. |
+| `GET` | `/shipment/{id}` | Returns the shipment for the provided numeric ID. |
+
+Available sample shipment IDs: `12701` through `12707`.
+
+For an ID that is not present, the API returns:
+
+```json
+{
+  "detail": "The searched ID does not exist"
+}
+```
+
+## API documentation
+
+- Swagger UI: `http://127.0.0.1:8000/docs`
+- ReDoc: `http://127.0.0.1:8000/redoc`
+- Scalar: `http://127.0.0.1:8000/scalar`
