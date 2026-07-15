@@ -11,6 +11,15 @@ def get_shipment():
         "status": "In Transit"
     }
 
+@app.get("/shipment/latest")
+def get_latest_shipment() -> dict[str, Any]:
+    return {
+        "id": 12,
+        "weight": 0.6,
+        "content": "Glassware",
+        "status": "Placed"
+    }
+
 @app.get("/shipment/{id}")
 def get_shipment_by_id(id: int) -> dict[str, Any]:
     return {
