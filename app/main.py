@@ -1,11 +1,21 @@
 from fastapi import FastAPI # type: ignore
 from scalar_fastapi import get_scalar_api_reference # type: ignore
+from typing import Any
 
 app = FastAPI()
 
 @app.get("/shipment")
 def get_shipment():
     return {
+        "content": "Wooden Table",
+        "status": "In Transit"
+    }
+
+@app.get("/shipment/{id}")
+def get_shipment_by_id(id: int) -> dict[str, Any]:
+    return {
+        "id": id,
+        "weight": 2.5,
         "content": "Wooden Table",
         "status": "In Transit"
     }
