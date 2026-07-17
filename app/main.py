@@ -1,4 +1,4 @@
-from fastapi import FastAPI # type: ignore
+from fastapi import FastAPI, HTTPException, status # type: ignore
 from scalar_fastapi import get_scalar_api_reference # type: ignore
 from typing import Any
 
@@ -57,7 +57,9 @@ def get_latest_shipment() -> dict[str, Any]:
 @app.get("/shipment/{id}")
 def get_shipment_by_id(id: int) -> dict[str, Any]:
     if  id not in shipments:
-        return {"detail": "The searched ID does not exist"}
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "The searched ID does not exist")
     return shipments[id]
 
 @app.get("/scalar", include_in_schema = False)
