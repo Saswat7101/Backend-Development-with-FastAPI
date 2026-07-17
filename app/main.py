@@ -54,18 +54,17 @@ def get_latest_shipment() -> dict[str, Any]:
     id = max(shipments.keys())
     return shipments[id]
 
-@app.get("/shipment/{id}")
+@app.get("/shipment/{id:int}")
 def get_shipment_by_id(id: int) -> dict[str, Any]:
-    if  id not in shipments:
+    if id not in shipments:
         raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "The searched ID does not exist")
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The searched ID does not exist"
+        )
     return shipments[id]
 
 @app.post("/shipment")
-def submit_shipment(weight: float, data: dict[str, str]) -> dict[str, Any]:
-    # Extract the details from body
-    content = data["content"]
+def submit_shipment(content: str, weight: float) -> dict[str, Any]:
     # Validate weight:
     if weight > 25:
         raise HTTPException(
@@ -81,6 +80,22 @@ def submit_shipment(weight: float, data: dict[str, str]) -> dict[str, Any]:
     }
     # Return the response
     return {"id": new_id}
+
+@app.get("/shipment/{field}")
+def get_shipment_field(field: str, id: int) ->  Any:
+    if id not in shipments:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="The searched ID does not exist"
+        )
+
+    if field not in shipments[id]:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"The field '{field}' does not exist"
+        )
+
+    return shipments[id][field]
 
 @app.get("/scalar", include_in_schema = False)
 def get_scalar_docs():
