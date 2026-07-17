@@ -1,23 +1,23 @@
 # Shipment Tracking API
 
-A small FastAPI application for retrieving shipment information from an in-memory data store.
+A FastAPI application for retrieving and creating shipment records. Data is stored in memory, so shipments created while the server is running are lost when it restarts.
 
 ## Features
 
-- Retrieve a sample shipment.
-- Retrieve the most recently added shipment.
-- Look up a shipment by its numeric ID.
-- Browse the API with FastAPI's Swagger UI, ReDoc, or Scalar.
+- Retrieve a sample shipment, the latest shipment, or a shipment by ID.
+- Retrieve one field from a shipment.
+- Create a shipment with a maximum weight of 25 kg.
+- Browse the API using Swagger UI, ReDoc, or Scalar.
 
 ## Project structure
 
 ```text
 .
-├── app/
-│   ├── __init__.py
-│   └── main.py       # FastAPI application and shipment endpoints
-├── .gitignore
-└── README.md
+|-- app/
+|   |-- __init__.py
+|   `-- main.py       # FastAPI application and shipment endpoints
+|-- .gitignore
+`-- README.md
 ```
 
 ## Setup
@@ -43,7 +43,7 @@ Start the development server from the project root:
 uvicorn app.main:app --reload
 ```
 
-The API will run at `http://127.0.0.1:8000`.
+The API runs at `http://127.0.0.1:8000`.
 
 ## Endpoints
 
@@ -51,11 +51,35 @@ The API will run at `http://127.0.0.1:8000`.
 | --- | --- | --- |
 | `GET` | `/shipment` | Returns a sample shipment. |
 | `GET` | `/shipment/latest` | Returns the shipment with the highest ID. |
-| `GET` | `/shipment/{id}` | Returns the shipment for the provided numeric ID. |
+| `GET` | `/shipment/{id}` | Returns a shipment by numeric ID. |
+| `GET` | `/shipment/{field}?id={id}` | Returns one field (such as `content`, `weight`, or `status`) for a shipment. |
+| `POST` | `/shipment?content={content}&weight={weight}` | Creates a new shipment with the `Placed` status. |
 
-Available sample shipment IDs: `12701` through `12707`.
+The initial shipment IDs are `12701` through `12707`.
 
-For an ID that is not present, the API returns:
+### Create a shipment
+
+`content` and `weight` are required query parameters. The weight must not exceed 25 kg.
+
+```powershell
+curl -X POST "http://127.0.0.1:8000/shipment?content=Desk%20Lamp&weight=2.3"
+```
+
+Successful requests return the assigned ID:
+
+```json
+{
+  "id": 12708
+}
+```
+
+### Error responses
+
+- An unknown shipment ID returns `404 Not Found`.
+- An unknown shipment field returns `404 Not Found`.
+- A shipment weighing more than 25 kg returns `406 Not Acceptable`.
+
+For example:
 
 ```json
 {
