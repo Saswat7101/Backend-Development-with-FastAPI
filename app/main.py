@@ -99,13 +99,31 @@ def get_shipment_field(field: str, id: int) ->  Any:
 
 @app.put("/shipment")
 def shipment_update(id: int, content: str, weight: float, status: str) -> dict[str, Any]:
-    #Update the shipment data with new data
+    # Update the shipment data with new data
     shipments[id] = {
         "content": content,
         "weight": weight,
         "status": status
     }
     return shipments[id]
+
+@app.patch("/shipment")
+def patch_shipment(id: int, body: dict[str, Any]) -> dict[str, Any]:
+    shipment = shipments[id]
+    # Update the provided fields
+
+    # if content:
+    #     shipment["content"] = content
+    # if weight:
+    #     shipment["weight"] = weight
+    # if status:
+    #     shipment["status"] = status
+
+    shipment.update(body)
+
+    # Set the updated fields back into the db and return the same
+    shipments[id] = shipment
+    return shipment
 
 @app.get("/scalar", include_in_schema = False)
 def get_scalar_docs():
