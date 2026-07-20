@@ -1,10 +1,8 @@
-from enum import Enum
-
 from fastapi import FastAPI, HTTPException, status # type: ignore
 from scalar_fastapi import get_scalar_api_reference # type: ignore
 from typing import Any
 
-from app.schemas import Shipment
+from .schemas import Shipment, ShipmentStatus
 
 app = FastAPI()
 
@@ -58,8 +56,8 @@ def get_latest_shipment() -> dict[str, Any]:
     id = max(shipments.keys())
     return shipments[id]
 
-@app.get("/shipment/{id:int}")
-def get_shipment_by_id(id: int) -> dict[str, Any]:
+@app.get("/shipment/{id:int}", response_model = Shipment)
+def get_shipment_by_id(id: int):
     if id not in shipments:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -94,12 +92,6 @@ def get_shipment_field(field: str, id: int) ->  Any:
         )
 
     return shipments[id][field]
-
-class ShipmentStatus(str, Enum):
-    placed = "Placed"
-    in_transit = "In Transit"
-    out_for_delivery = "Out For Delivery"
-    delivered = "Delivered"
 
 @app.patch("/shipment")
 def update_shipment(id: int, body: dict[str, ShipmentStatus]) -> dict[str, Any]:
