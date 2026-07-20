@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, status # type: ignore
 from scalar_fastapi import get_scalar_api_reference # type: ignore
 from typing import Any
 
-from .schemas import Shipment, ShipmentStatus
+from .schemas import ShipmentRead, ShipmentCreate, ShipmentUpdate
 
 app = FastAPI()
 
@@ -56,7 +56,7 @@ def get_latest_shipment() -> dict[str, Any]:
     id = max(shipments.keys())
     return shipments[id]
 
-@app.get("/shipment/{id:int}", response_model = Shipment)
+@app.get("/shipment/{id:int}", response_model = ShipmentRead)
 def get_shipment_by_id(id: int):
     if id not in shipments:
         raise HTTPException(
@@ -66,7 +66,7 @@ def get_shipment_by_id(id: int):
     return shipments[id]
 
 @app.post("/shipment")
-def submit_shipment(shipment: Shipment) -> dict[str, Any]:
+def submit_shipment(shipment: ShipmentCreate) -> dict[str, int]:
     # Create and assignshipment a new id
     new_id = max(shipments.keys()) + 1
     shipments[new_id] = {
@@ -93,8 +93,8 @@ def get_shipment_field(field: str, id: int) ->  Any:
 
     return shipments[id][field]
 
-@app.patch("/shipment")
-def update_shipment(id: int, body: dict[str, ShipmentStatus]) -> dict[str, Any]:
+@app.patch("/shipment", response_model= ShipmentRead)
+def update_shipment(id: int, body: dict[str, ShipmentUpdate]):
     # Update the provided fields
     shipments[id].update(body)
     return shipments[id]
