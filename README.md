@@ -1,12 +1,13 @@
 # Shipment Tracking API
 
-A FastAPI application for retrieving and creating shipment records. Data is stored in memory, so shipments created while the server is running are lost when it restarts.
+A FastAPI application for managing shipment records. It uses Pydantic models to validate request and response data. Data is stored in memory, so changes are lost when the server restarts.
 
 ## Features
 
 - Retrieve a sample shipment, the latest shipment, a shipment by ID, or one field from a shipment.
-- Create, fully update, partially update, and delete shipment records.
-- Limit newly created shipments to a maximum weight of 25 kg.
+- Create, partially update, and delete shipment records.
+- Validate shipment content, weight, destination, and status with Pydantic schemas.
+- Limit shipment weight to 25 kg.
 - Browse the API using Swagger UI, ReDoc, or Scalar.
 
 ## Project structure
@@ -15,7 +16,8 @@ A FastAPI application for retrieving and creating shipment records. Data is stor
 .
 |-- app/
 |   |-- __init__.py
-|   `-- main.py       # FastAPI application and shipment endpoints
+|   |-- main.py       # FastAPI application and shipment endpoints
+|   `-- schemas.py    # Pydantic shipment models and status values
 |-- .gitignore
 `-- README.md
 ```
@@ -53,8 +55,7 @@ The API runs at `http://127.0.0.1:8000`.
 | `GET` | `/shipment/latest` | Returns the shipment with the highest ID. |
 | `GET` | `/shipment/{id}` | Returns a shipment by numeric ID. |
 | `GET` | `/shipment/{field}?id={id}` | Returns one field (such as `content`, `weight`, or `status`) for a shipment. |
-| `POST` | `/shipment?content={content}&weight={weight}` | Creates a new shipment with the `Placed` status. |
-| `PUT` | `/shipment?id={id}&content={content}&weight={weight}&status={status}` | Replaces every field of a shipment. |
+| `POST` | `/shipment` | Creates a new shipment from a JSON request body with the `Placed` status. |
 | `PATCH` | `/shipment?id={id}` | Updates the shipment fields supplied in a JSON request body. |
 | `DELETE` | `/shipment?id={id}` | Deletes a shipment. |
 
@@ -62,10 +63,10 @@ The initial shipment IDs are `12701` through `12707`.
 
 ### Create a shipment
 
-`content` and `weight` are required query parameters. The weight must not exceed 25 kg.
+Send `content`, `weight`, and `destination` in a JSON request body. `weight` must not exceed 25 kg.
 
 ```powershell
-curl -X POST "http://127.0.0.1:8000/shipment?content=Desk%20Lamp&weight=2.3"
+curl -X POST "http://127.0.0.1:8000/shipment" -H "Content-Type: application/json" -d '{"content":"Desk Lamp","weight":2.3,"destination":11001}'
 ```
 
 Successful requests return the assigned ID:
@@ -78,16 +79,10 @@ Successful requests return the assigned ID:
 
 ### Update a shipment
 
-Use `PUT` to replace all fields. Its `id`, `content`, `weight`, and `status` are required query parameters:
+Use `PATCH` to update a shipment. The ID is a required query parameter; `status` is required in the JSON body, while `content`, `weight`, and `destination` are optional. Valid status values are `Placed`, `In Transit`, `Out For Delivery`, and `Delivered`.
 
 ```powershell
-curl -X PUT "http://127.0.0.1:8000/shipment?id=12701&content=Wooden%20Desk&weight=12.5&status=Processing"
-```
-
-Use `PATCH` to update only the fields included in its JSON body:
-
-```powershell
-curl -X PATCH "http://127.0.0.1:8000/shipment?id=12701" -H "Content-Type: application/json" -d '{"status":"Delivered"}'
+curl -X PATCH "http://127.0.0.1:8000/shipment?id=12701" -H "Content-Type: application/json" -d '{"status":"Delivered","destination":11002}'
 ```
 
 ### Delete a shipment
@@ -108,7 +103,7 @@ The endpoint confirms the deleted shipment ID:
 
 - `GET /shipment/{id}` and field lookup requests for an unknown shipment ID return `404 Not Found`.
 - A field lookup for an unknown field returns `404 Not Found`.
-- A new shipment weighing more than 25 kg returns `406 Not Acceptable`.
+- Missing or invalid request data, including a weight above 25 kg, returns `422 Unprocessable Entity`.
 
 For example:
 
