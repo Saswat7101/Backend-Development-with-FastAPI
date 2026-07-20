@@ -1,3 +1,5 @@
+from enum import Enum
+
 from fastapi import FastAPI, HTTPException, status # type: ignore
 from scalar_fastapi import get_scalar_api_reference # type: ignore
 from typing import Any
@@ -93,33 +95,17 @@ def get_shipment_field(field: str, id: int) ->  Any:
 
     return shipments[id][field]
 
-@app.put("/shipment")
-def shipment_update(id: int, content: str, weight: float, status: str) -> dict[str, Any]:
-    # Update the shipment data with new data
-    shipments[id] = {
-        "content": content,
-        "weight": weight,
-        "status": status
-    }
-    return shipments[id]
+class ShipmentStatus(str, Enum):
+    placed = "Placed"
+    in_transit = "In Transit"
+    out_for_delivery = "Out For Delivery"
+    delivered = "Delivered"
 
 @app.patch("/shipment")
-def patch_shipment(id: int, body: dict[str, Any]) -> dict[str, Any]:
-    shipment = shipments[id]
+def update_shipment(id: int, body: dict[str, ShipmentStatus]) -> dict[str, Any]:
     # Update the provided fields
-
-    # if content:
-    #     shipment["content"] = content
-    # if weight:
-    #     shipment["weight"] = weight
-    # if status:
-    #     shipment["status"] = status
-
-    shipment.update(body)
-
-    # Set the updated fields back into the db and return the same
-    shipments[id] = shipment
-    return shipment
+    shipments[id].update(body)
+    return shipments[id]
 
 @app.delete("/shipment")
 def delete_shipment(id: int) -> dict[str, str]:
