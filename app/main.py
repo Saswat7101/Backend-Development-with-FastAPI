@@ -70,8 +70,7 @@ def submit_shipment(shipment: ShipmentCreate) -> dict[str, int]:
     # Create and assignshipment a new id
     new_id = max(shipments.keys()) + 1
     shipments[new_id] = {
-        "content": shipment.content,
-        "weight": shipment.weight,
+        **shipment.model_dump(),
         "status": "Placed"
     }
     # Return the response
@@ -94,9 +93,9 @@ def get_shipment_field(field: str, id: int) ->  Any:
     return shipments[id][field]
 
 @app.patch("/shipment", response_model= ShipmentRead)
-def update_shipment(id: int, body: dict[str, ShipmentUpdate]):
+def update_shipment(id: int, body: ShipmentUpdate):
     # Update the provided fields
-    shipments[id].update(body)
+    shipments[id].update(body.model_dump(exclude_none= True))
     return shipments[id]
 
 @app.delete("/shipment")
