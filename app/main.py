@@ -3,46 +3,9 @@ from scalar_fastapi import get_scalar_api_reference # type: ignore
 from typing import Any
 
 from .schemas import ShipmentRead, ShipmentCreate, ShipmentUpdate
+from .database import shipments, save
 
 app = FastAPI()
-
-shipments = {
-    12701: {
-        "weight": 2.5,
-        "content": "Wooden Table",
-        "status": "In Transit"
-    },
-    12702: {
-        "weight": 0.8,
-        "content": "Ceramic Mugs",
-        "status": "Placed"
-    },
-    12703: {
-        "weight": 14.2,
-        "content": "Office Chair",
-        "status": "Out for Delivery"
-    },
-    12704: {
-        "weight": 1.1,
-        "content": "Wireless Headphones",
-        "status": "Delivered"
-    },
-    12705: {
-        "weight": 6.7,
-        "content": "Kitchen Blender",
-        "status": "Processing"
-    },
-    12706: {
-        "weight": 3.4,
-        "content": "Cotton Bed Sheets",
-        "status": "In Transit"
-    },
-    12707: {
-        "weight": 9.5,
-        "content": "Floor Lamp",
-        "status": "Delayed"
-    }
-}
 
 @app.get("/shipment")
 def get_shipment():
@@ -71,8 +34,10 @@ def submit_shipment(shipment: ShipmentCreate) -> dict[str, int]:
     new_id = max(shipments.keys()) + 1
     shipments[new_id] = {
         **shipment.model_dump(),
+        "id": new_id,
         "status": "Placed"
     }
+    save()
     # Return the response
     return {"id": new_id}
 
@@ -96,6 +61,7 @@ def get_shipment_field(field: str, id: int) ->  Any:
 def update_shipment(id: int, body: ShipmentUpdate):
     # Update the provided fields
     shipments[id].update(body.model_dump(exclude_none= True))
+    save()
     return shipments[id]
 
 @app.delete("/shipment")
