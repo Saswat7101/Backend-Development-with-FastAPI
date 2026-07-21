@@ -1,1 +1,58 @@
-[{"id": 12701, "weight": 2.5, "content": "Wooden Table", "destination": 11642, "status": "In Transit"}, {"id": 12702, "weight": 0.8, "content": "Ceramic Mugs", "destination": 11187, "status": "Placed"}, {"id": 12703, "weight": 14.2, "content": "Office Chair", "destination": 11893, "status": "Out for Delivery"}, {"id": 12704, "weight": 1.1, "content": "Wireless Headphones", "destination": 11426, "status": "Delivered"}, {"id": 12705, "weight": 6.7, "content": "Kitchen Blender", "destination": 11751, "status": "Processing"}, {"id": 12706, "weight": 3.4, "content": "Cotton Bed Sheets", "destination": 11264, "status": "In Transit"}, {"id": 12707, "weight": 9.5, "content": "Floor Lamp", "destination": 11908, "status": "Delayed"}, {"content": "Palm Trees", "weight": 8.0, "destination": 11007, "id": 12708, "status": "Placed"}]
+[
+  {
+    "id": 12701,
+    "weight": 2.5,
+    "content": "Wooden Table",
+    "destination": 11642,
+    "status": "In Transit"
+  },
+  {
+    "id": 12702,
+    "weight": 0.8,
+    "content": "Ceramic Mugs",
+    "destination": 11187,
+    "status": "Placed"
+  },
+  {
+    "id": 12703,
+    "weight": 14.2,
+    "content": "Office Chair",
+    "destination": 11893,
+    "status": "Out for Delivery"
+  },
+  {
+    "id": 12704,
+    "weight": 1.1,
+    "content": "Wireless Headphones",
+    "destination": 11426,
+    "status": "Delivered"
+  },
+  {
+    "id": 12705,
+    "weight": 6.7,
+    "content": "Kitchen Blender",
+    "destination": 11751,
+    "status": "Processing"
+  },
+  {
+    "id": 12706,
+    "weight": 3.4,
+    "content": "Cotton Bed Sheets",
+    "destination": 11264,
+    "status": "In Transit"
+  },
+  {
+    "id": 12707,
+    "weight": 9.5,
+    "content": "Floor Lamp",
+    "destination": 11908,
+    "status": "Delayed"
+  },
+  {
+    "content": "Palm Trees",
+    "weight": 8.0,
+    "destination": 11007,
+    "id": 12708,
+    "status": "Placed"
+  }
+]
