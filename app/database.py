@@ -24,7 +24,11 @@ result = cursor.fetchall()
 print(result)
 
 # Update a record
-cursor.execute("UPDATE shipment SET status = 'In Transit' WHERE id = 12705")
+id = 12705
+status = "In Transit"
+cursor.execute(
+    "UPDATE shipment SET status = :status WHERE id = :id", {"status": status, "id": id}
+)
 connection.commit()
 
 # Delete a record by id
