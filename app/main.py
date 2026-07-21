@@ -1,77 +1,49 @@
-from fastapi import FastAPI, HTTPException, status # type: ignore
-from scalar_fastapi import get_scalar_api_reference # type: ignore
-from typing import Any
+from fastapi import FastAPI, HTTPException, status  # type: ignore
+from scalar_fastapi import get_scalar_api_reference  # type: ignore
 
 from .schemas import ShipmentRead, ShipmentCreate, ShipmentUpdate
-from .database import shipments, save
+from .database import Database
 
 app = FastAPI()
+db = Database()
 
-@app.get("/shipment")
-def get_shipment():
-    return {
-        "content": "Wooden Table",
-        "status": "In Transit"
-    }
 
-@app.get("/shipment/latest")
-def get_latest_shipment() -> dict[str, Any]:
-    id = max(shipments.keys())
-    return shipments[id]
-
-@app.get("/shipment/{id:int}", response_model = ShipmentRead)
+# Read a shipment by id
+@app.get("/shipment", response_model=ShipmentRead)
 def get_shipment_by_id(id: int):
-    if id not in shipments:
+    shipment = db.get(id)
+    # Check for shipment with given id
+    if shipment is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="The searched ID does not exist"
+            detail=f"Given ID: {id} does not exist",
         )
-    return shipments[id]
+    return shipment
 
-@app.post("/shipment")
+
+# Create a new shipment with content and weight
+@app.post("/shipment", response_model=None)
 def submit_shipment(shipment: ShipmentCreate) -> dict[str, int]:
-    # Create and assignshipment a new id
-    new_id = max(shipments.keys()) + 1
-    shipments[new_id] = {
-        **shipment.model_dump(),
-        "id": new_id,
-        "status": "Placed"
-    }
-    save()
+    new_id = db.create(shipment)
     # Return the response
     return {"id": new_id}
 
-@app.get("/shipment/{field}")
-def get_shipment_field(field: str, id: int) ->  Any:
-    if id not in shipments:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="The searched ID does not exist"
-        )
 
-    if field not in shipments[id]:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"The field '{field}' does not exist"
-        )
-
-    return shipments[id][field]
-
-@app.patch("/shipment", response_model= ShipmentRead)
-def update_shipment(id: int, body: ShipmentUpdate):
+# Update fields of a shipment
+@app.patch("/shipment", response_model=ShipmentRead)
+def update_shipment(id: int, shipment: ShipmentUpdate):
     # Update the provided fields
-    shipments[id].update(body.model_dump(exclude_none= True))
-    save()
-    return shipments[id]
+    shipment = db.update(id, shipment)
+    return shipment
 
+
+# Delete a shipment by id
 @app.delete("/shipment")
 def delete_shipment(id: int) -> dict[str, str]:
-    shipments.pop(id)
+    db.delete(id)
     return {"detail": f"Shipment with #{id} id deleted!"}
 
-@app.get("/scalar", include_in_schema = False)
+
+@app.get("/scalar", include_in_schema=False)
 def get_scalar_docs():
-    return get_scalar_api_reference(
-        openapi_url = app.openapi_url,
-        title = "Scalar API"
-    )
+    return get_scalar_api_reference(openapi_url=app.openapi_url, title="Scalar API")

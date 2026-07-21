@@ -7,17 +7,16 @@ from app.schemas import ShipmentCreate, ShipmentUpdate
 class Database:
     def __init__(self):
         # Make the connection
-        self.conn = sqlite3.connect("sqlite.db")
+        self.conn = sqlite3.connect("sqlite.db", check_same_thread=False)
         # Get cursor to execute queries and fetch data
         self.cur = self.conn.cursor()
         # Create table if not exists
-        self.create_table("shipment")
+        self.create_table()
 
-    def create_table(self, name: str):
+    def create_table(self):
         # Create a table
         self.cur.execute(
-            "CREATE TABLE IF NOT EXISTS ? (id INTEGER PRIMARY KEY, content TEXT, weight REAL, status TEXT)",
-            (name,),
+            "CREATE TABLE IF NOT EXISTS shipment (id INTEGER PRIMARY KEY, content TEXT, weight REAL, status TEXT)"
         )
 
     def create(self, shipment: ShipmentCreate) -> int:
@@ -46,10 +45,10 @@ class Database:
             else None
         )
 
-    def update(self, shipment: ShipmentUpdate) -> dict[str, Any]:
+    def update(self, id: int, shipment: ShipmentUpdate) -> dict[str, Any]:
         self.cur.execute(
             "UPDATE shipment SET status = :status WHERE id = :id",
-            {"id": id ** shipment.model_dump()},
+            {"id": id, **shipment.model_dump()},
         )
         self.conn.commit()
         return self.get(id)
