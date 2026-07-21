@@ -1,39 +1,62 @@
 import sqlite3
+from typing import Any
 
-# Make the connection
-connection = sqlite3.connect("sqlite.db")
-cursor = connection.cursor()
+from app.schemas import ShipmentCreate, ShipmentUpdate
 
-# Create a table
-cursor.execute(
-    "CREATE TABLE IF NOT EXISTS shipment (id INTEGER PRIMARY KEY, content TEXT, weight REAL, status TEXT)"
-)
 
-# Drop a table
-# cursor.execute("DROP TABLE shipment")
+class Database:
+    def __init__(self):
+        # Make the connection
+        self.conn = sqlite3.connect("sqlite.db")
+        # Get cursor to execute queries and fetch data
+        self.cur = self.conn.cursor()
+        # Create table if not exists
+        self.create_table("shipment")
 
-# Add shipment data
-# cursor.execute(
-#     "INSERT INTO shipment (id, content, weight, status) VALUES (12701, 'Wooden Table', 2.5, 'In Transit'), (12702, 'Ceramic Mugs', 0.8, 'Placed'), (12703, 'Office Chair', 14.2, 'Out for Delivery'), (12704, 'Wireless Headphones', 1.1, 'Delivered'), (12705, 'Kitchen Blender', 6.7, 'Processing'), (12706, 'Cotton Bed Sheets', 3.4, 'In Transit'), (12707, 'Floor Lamp', 9.5, 'Delayed'), (12708, 'Palm Trees', 8.0, 'Placed');"
-# )
-# connection.commit()
+    def create_table(self, name: str):
+        # Create a table
+        self.cur.execute(
+            "CREATE TABLE IF NOT EXISTS ? (id INTEGER PRIMARY KEY, content TEXT, weight REAL, status TEXT)",
+            (name,),
+        )
 
-# Read a shipment by id
-cursor.execute("SELECT * FROM shipment WHERE id = 12701")
-result = cursor.fetchall()
-print(result)
+    def create(self, shipment: ShipmentCreate) -> int:
+        #   Find a new id
+        self.cur.execute("SELECT MAX(id) FROM shipment")
+        result = self.cur.fetchone()
+        new_id = result[0] + 1
+        # Insert new data
+        self.cur.execute(
+            """
+                INSERT INTO shipment
+                VALUES (:id, :content, :weight, :status);
+            """,
+            {"id": new_id, **shipment.model_dump(), "status": "Placed"},
+        )
+        self.conn.commit()
+        # Return the id
+        return new_id
 
-# Update a record
-id = 12705
-status = "In Transit"
-cursor.execute(
-    "UPDATE shipment SET status = :status WHERE id = :id", {"status": status, "id": id}
-)
-connection.commit()
+    def get(self, id: int) -> dict[str, Any] | None:
+        self.cur.execute("SELECT * FROM shipment WHERE id = ?", (id,))
+        row = self.cur.fetchone()
+        return (
+            {"id": row[0], "content": row[1], "weight": row[2], "status": row[3]}
+            if row
+            else None
+        )
 
-# Delete a record by id
-# cursor.execute("DELETE FROM shipment WHERE id = 12703")
-# connection.commit()
+    def update(self, shipment: ShipmentUpdate) -> dict[str, Any]:
+        self.cur.execute(
+            "UPDATE shipment SET status = :status WHERE id = :id",
+            {"id": id ** shipment.model_dump()},
+        )
+        self.conn.commit()
+        return self.get(id)
 
-# Close the connection once db operations are done
-connection.close()
+    def delete(self, id: int):
+        self.cur.execute("DELETE FROM shipment WHERE id = ?", (id,))
+        self.conn.commit()
+
+    def close(self):
+        self.conn.close()
