@@ -7,7 +7,7 @@ A FastAPI application for creating, retrieving, updating, and deleting shipment 
 - Create and retrieve shipments by numeric ID.
 - Update a shipment's status.
 - Delete shipments.
-- Validate request and response data with Pydantic models.
+- Validate API data with Pydantic schemas and define shipment entities with SQLModel.
 - Browse the API through Swagger UI, ReDoc, or Scalar.
 
 ## Project structure
@@ -17,8 +17,11 @@ A FastAPI application for creating, retrieving, updating, and deleting shipment 
 |-- app/
 |   |-- __init__.py
 |   |-- database.py   # SQLite data-access layer
+|   |-- database/
+|   |   |-- __init__.py
+|   |   `-- models.py # SQLModel shipment entity and status enum
 |   |-- main.py       # FastAPI application and routes
-|   `-- schemas.py    # Pydantic shipment models and status values
+|   `-- schemas.py    # Pydantic request and response schemas
 |-- sqlite.db         # SQLite database
 `-- README.md
 ```
@@ -35,7 +38,7 @@ python -m venv env
 Install the dependencies:
 
 ```powershell
-pip install fastapi "uvicorn[standard]" scalar-fastapi
+pip install fastapi "uvicorn[standard]" scalar-fastapi sqlmodel
 ```
 
 ## Run the API
