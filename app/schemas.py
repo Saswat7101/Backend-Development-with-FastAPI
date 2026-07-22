@@ -1,17 +1,11 @@
 from random import randint
-from enum import Enum
 from pydantic import BaseModel, Field
+
+from app.database.models import ShipmentStatus
 
 
 def random_destination():
     return randint(11000, 11999)
-
-
-class ShipmentStatus(str, Enum):
-    placed = "Placed"
-    in_transit = "In Transit"
-    out_for_delivery = "Out For Delivery"
-    delivered = "Delivered"
 
 
 class BaseShipment(BaseModel):

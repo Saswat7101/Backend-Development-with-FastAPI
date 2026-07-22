@@ -1,0 +1,21 @@
+from datetime import datetime
+from enum import Enum
+from sqlmodel import Field, SQLModel
+
+
+class ShipmentStatus(str, Enum):
+    placed = "Placed"
+    in_transit = "In Transit"
+    out_for_delivery = "Out For Delivery"
+    delivered = "Delivered"
+
+
+class Shipment(SQLModel):
+    __tablename__ = "shipment"
+
+    id: int = Field(primary_key=True)
+    content: str
+    weight: float = Field(le=25)
+    destination: int
+    status: ShipmentStatus
+    estimated_delivery: datetime
