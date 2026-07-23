@@ -1,10 +1,20 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException, status  # type: ignore
 from scalar_fastapi import get_scalar_api_reference  # type: ignore
 
 from .schemas import ShipmentRead, ShipmentCreate, ShipmentUpdate
 from .database import Database
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan_handler(app: FastAPI):
+    print("Server started...")
+    yield
+    print(".. Server Stopped!")
+
+
+app = FastAPI(lifespan=lifespan_handler)
 db = Database()
 
 
