@@ -8,10 +8,10 @@ engine = create_engine(
     url="sqlite:///sqlite.db", echo=True, connect_args={"check_same_thread": False}
 )
 
-from .models import Shipment
-
 
 def create_db_tables():
+    from .models import Shipment  # noqa: F401
+
     SQLModel.metadata.create_all(bind=engine)
 
 
