@@ -1,18 +1,19 @@
+import asyncio
 import time
 
 from rich import print
 
 
-def endpoint(route):
+async def endpoint(route: str) -> str:
     print(f">> handling {route}")
 
     # emulate database delay
-    time.sleep(2)
+    await asyncio.sleep(1)
 
     print(f"<< response {route}")
 
 
-def server():
+async def server():
     # Run test requests
     tests = (
         "GET /shipment?id=1",
@@ -23,11 +24,12 @@ def server():
     start = time.perf_counter()
 
     for route in tests:
-        endpoint(route)
+        result = await endpoint(route)
+        print("Result: ", result)
 
     end = time.perf_counter()
     print(f"Time taken: {end - start:.2f}s")
 
 
 # Run server
-server()
+asyncio.run(server())
