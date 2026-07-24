@@ -9,6 +9,7 @@ A FastAPI application for creating, retrieving, updating, and deleting shipment 
 - Delete shipments.
 - Store shipment destinations and automatically assign an estimated delivery three days after creation.
 - Validate API data with Pydantic schemas and define shipment entities with SQLModel.
+- Include an `asyncio.TaskGroup` concurrency demonstration.
 - Browse the API through Swagger UI, ReDoc, or Scalar.
 
 ## Project structure
@@ -24,6 +25,7 @@ A FastAPI application for creating, retrieving, updating, and deleting shipment 
 |   |   `-- session.py # SQLModel engine, sessions, and table setup
 |   |-- main.py       # FastAPI application and routes
 |   `-- schemas.py    # Pydantic request and response schemas
+|-- async.py          # Concurrent request-handling demonstration
 |-- sqlite.db         # SQLite database
 `-- README.md
 ```
@@ -40,7 +42,7 @@ python -m venv env
 Install the dependencies:
 
 ```powershell
-pip install fastapi "uvicorn[standard]" scalar-fastapi sqlmodel
+pip install fastapi "uvicorn[standard]" scalar-fastapi sqlmodel rich
 ```
 
 ## Run the API
@@ -52,6 +54,16 @@ uvicorn app.main:app --reload
 ```
 
 The API runs at `http://127.0.0.1:8000`.
+
+## Async concurrency example
+
+The standalone `async.py` script demonstrates handling several simulated requests concurrently with `asyncio.TaskGroup`. It requires Python 3.11 or later.
+
+```powershell
+python async.py
+```
+
+Each simulated request waits for one second, while the task group runs them concurrently.
 
 ## Endpoints
 
