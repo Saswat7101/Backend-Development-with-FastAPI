@@ -1,13 +1,8 @@
 from datetime import datetime
-from random import randint
 
 from pydantic import BaseModel, Field
 
 from app.database.models import ShipmentStatus
-
-
-def random_destination():
-    return randint(11000, 11999)
 
 
 class BaseShipment(BaseModel):
@@ -17,6 +12,7 @@ class BaseShipment(BaseModel):
 
 
 class ShipmentRead(BaseShipment):
+    id: int
     status: ShipmentStatus
     estimated_delivery: datetime
 

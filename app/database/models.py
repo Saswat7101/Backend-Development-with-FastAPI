@@ -1,13 +1,15 @@
 from datetime import datetime
 from enum import Enum
+
+from sqlalchemy import Column, DateTime
 from sqlmodel import Field, SQLModel
 
 
 class ShipmentStatus(str, Enum):
-    placed = "Placed"
-    in_transit = "In Transit"
-    out_for_delivery = "Out For Delivery"
-    delivered = "Delivered"
+    placed = "placed"
+    in_transit = "in_transit"
+    out_for_delivery = "out_for_delivery"
+    delivered = "delivered"
 
 
 class Shipment(SQLModel, table=True):
@@ -18,4 +20,4 @@ class Shipment(SQLModel, table=True):
     weight: float = Field(le=25)
     destination: int
     status: ShipmentStatus
-    estimated_delivery: datetime
+    estimated_delivery: datetime = Field(sa_column=Column(DateTime(timezone=True)))
