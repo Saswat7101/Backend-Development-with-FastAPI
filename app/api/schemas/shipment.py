@@ -1,5 +1,6 @@
 from datetime import datetime
 from random import randint
+
 from pydantic import BaseModel, Field
 
 from app.database.models import ShipmentStatus
